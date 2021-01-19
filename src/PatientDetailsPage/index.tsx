@@ -1,59 +1,41 @@
 import React, { useState } from "react";
-import { useParams, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import axios from "axios";
-import { Container, Icon } from "semantic-ui-react";
+import { Container, Icon, Label } from "semantic-ui-react";
 
 import { Patient } from "../types"; 
 import { apiBaseUrl } from "../constants"; 
 
 const PatientDetailsPage: React.FC = () => {
-  //const [{ patients }, dispatch] = useStateValue();
-
-  //const [error, setError] = React.useState<string | undefined>(); 
-
-  const [patientName, setPatientName] = useState('LALA');
+  
+  const [patientName, setPatientName] = useState('Loading');
   const [patientSsn, setPatientSsn] = useState('');
   const [patientOccupation, setPatientOccupation] = useState('');
-  const [genderIcon, setgenderIcon] = useState('genderless');
+  const [genderIcon, setgenderIcon] = useState('other');
   
-  const { id } = useParams<{ id: string }>();
+  //const { id } = useParams<{ id: string }>();
   const location = useLocation<{pathname: string}>();
-  const idPrm = location.pathname.split('/');
-  let patientDetails;
+  const idPrm: string[] = location.pathname.split('/');
+  console.log("idPrm:", idPrm);
   React.useEffect(() => {
+   
     axios.get<void>(`${apiBaseUrl}/ping`);
 
     const fetchPatientDetails = async () => {
-      try {
-        const patientDetails2 = await axios.get<Patient[]>(
-            `${apiBaseUrl}/patients/${idPrm[2]}`
-            
-          );
-        patientDetails = Object.entries(patientDetails2.data);
         enum genderIcons {
             male = 'mars',
             female = 'venus',
             other = 'genderless'
         } 
-        console.log("genderIcons: ", genderIcons["other"]);
-        patientDetails.forEach(([key, value]) => {
-            console.log("pt key:", key);
-            console.log("pt value: ", value);
-            switch (key) {
-                case "name":
-                    setPatientName(String(value));
-                    break;
-                case "ssn":
-                    setPatientSsn(String(value));
-                    break;
-                case "occupation":
-                    setPatientOccupation(String(value));
-                    break;
-                case "gender":
-                    setgenderIcon(genderIcons['female']);
-            }
-            
-        });
+      try {
+        const patientDetailsFromApi = await axios.get<Patient>(
+            `${apiBaseUrl}/patients/${idPrm[2]}`
+          );
+
+        setPatientName(patientDetailsFromApi.data.name);
+        setPatientSsn(String(patientDetailsFromApi.data.ssn));
+        setPatientOccupation(patientDetailsFromApi.data.occupation);
+        setgenderIcon(genderIcons[patientDetailsFromApi.data.gender]);
        
       } catch (e) {
         console.error(e);
@@ -61,21 +43,19 @@ const PatientDetailsPage: React.FC = () => {
     };
 
     fetchPatientDetails();
-  }, []);
+  }, );
   
-  if (patientName === 'LALA') {
+  if (patientName === 'Loading') {
        return <><Icon loading name='spinner' size='big' /></>;
   } else {
 
   
-  console.log("käytiinkö täällä ees?: ",  patientName, "result: ", patientDetails);
-   
   return (
       <>
       
     <div className="App">
       <Container textAlign="left">
-        <div className="divider"><h3>{patientName}<Icon name='mars' size='large' /></h3></div>
+        <div className="divider"><h3>{patientName}<Label icon={{name: genderIcon}} size='large' /></h3></div>
         <div>ID: {location.pathname}</div>
         <div>ssn: {patientSsn}</div>
         <div>occupation: {patientOccupation}</div>

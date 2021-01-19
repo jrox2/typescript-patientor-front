@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "formik": "^2.2.6",
     "react": "^16.14.0",
     "react-dom": "^16.14.0",
@@ -21,7 +21,7 @@
     "@typescript-eslint/eslint-plugin": "^2.34.0",
     "@typescript-eslint/parser": "^2.34.0",
     "eslint-config-react": "^1.1.7",
-    "react-scripts": "3.3.0",
+    "react-scripts": "^3.4.1",
     "typescript": "^3.9.7"
   },
   "scripts": {

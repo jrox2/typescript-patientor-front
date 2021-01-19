@@ -50,6 +50,7 @@ const PatientListPage: React.FC = () => {
             <Table.HeaderCell>Name</Table.HeaderCell>
             <Table.HeaderCell>Gender</Table.HeaderCell>
             <Table.HeaderCell>Occupation</Table.HeaderCell>
+            <Table.HeaderCell>SSN</Table.HeaderCell>
             <Table.HeaderCell>Health Rating</Table.HeaderCell>
           </Table.Row>
         </Table.Header>
@@ -59,6 +60,7 @@ const PatientListPage: React.FC = () => {
               <Table.Cell><a href={`details/${patient.id}`} onClick={() => <PatientDetailsPage />}>{patient.name}</a></Table.Cell>
               <Table.Cell>{patient.gender}</Table.Cell>
               <Table.Cell>{patient.occupation}</Table.Cell>
+              <Table.Cell>{patient.ssn}</Table.Cell>
               <Table.Cell>
                 <HealthRatingBar showText={false} rating={1} />
               </Table.Cell>
