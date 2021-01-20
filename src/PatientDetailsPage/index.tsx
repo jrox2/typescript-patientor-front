@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import { useLocation } from "react-router-dom";
 import axios from "axios";
 import { Container, Icon, Label } from "semantic-ui-react";
-
 import { Patient } from "../types"; 
 import { apiBaseUrl } from "../constants"; 
+import './index.css';
 
 const PatientDetailsPage: React.FC = () => {
   
@@ -16,11 +16,11 @@ const PatientDetailsPage: React.FC = () => {
   //const { id } = useParams<{ id: string }>();
   const location = useLocation<{pathname: string}>();
   const idPrm: string[] = location.pathname.split('/');
-  console.log("idPrm:", idPrm);
   React.useEffect(() => {
    
     axios.get<void>(`${apiBaseUrl}/ping`);
 
+   
     const fetchPatientDetails = async () => {
         enum genderIcons {
             male = 'mars',
@@ -31,7 +31,7 @@ const PatientDetailsPage: React.FC = () => {
         const patientDetailsFromApi = await axios.get<Patient>(
             `${apiBaseUrl}/patients/${idPrm[2]}`
           );
-
+        
         setPatientName(patientDetailsFromApi.data.name);
         setPatientSsn(String(patientDetailsFromApi.data.ssn));
         setPatientOccupation(patientDetailsFromApi.data.occupation);
@@ -43,7 +43,7 @@ const PatientDetailsPage: React.FC = () => {
     };
 
     fetchPatientDetails();
-  }, );
+  }, [] );
   
   if (patientName === 'Loading') {
        return <><Icon loading name='spinner' size='big' /></>;
@@ -55,7 +55,7 @@ const PatientDetailsPage: React.FC = () => {
       
     <div className="App">
       <Container textAlign="left">
-        <div className="divider"><h3>{patientName}<Label icon={{name: genderIcon}} size='large' /></h3></div>
+        <div className="divider"><h3>{patientName}<Label icon={{name: genderIcon}} size='huge' className="iconLabel"/></h3></div>
         <div>ID: {location.pathname}</div>
         <div>ssn: {patientSsn}</div>
         <div>occupation: {patientOccupation}</div>
