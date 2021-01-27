@@ -1,3 +1,40 @@
+.ui.label {
+  padding: 0;
+}
+
 .ui.label.iconLabel {
   background-color: #ffffff !important;
+  color: rgba(0, 0, 0, 0.87) !important;
+  padding-left: 0.5rem;
+}
+
+.ui.label.iconLabel.green i {
+  color: green !important;
+}
+
+.ui.label.iconLabel.yellow i {
+  color: yellow !important;
+}
+
+.ui.label.iconLabel.orange i {
+  color: orange !important;
+}
+
+.ui.label.iconLabel.red i {
+  color: red !important;
+}
+
+.ui.label.iconLabel.white i {
+  color: white !important;
+}
+
+.ui.cards {
+  border: 1px solid #d4d4d4 !important;
+  border-radius: 5px;
+  padding: 1rem;
+  margin: 1rem 0rem;
+}
+
+.fluidLine {
+  width: 100%;
 }
