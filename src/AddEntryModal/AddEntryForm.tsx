@@ -40,6 +40,10 @@ const AddEntryForm: React.FC<Props> = ({ onSubmit, onCancel }) => {
         if (!values.specialist) {
           errors.specialist = requiredError;
         }
+        if (!values.healthCheckRating) {
+          errors.healthCheckRating = requiredError;
+        }
+        return errors;
       }}
     >
       {/* {({ isValid, dirty, setFieldValue, setFieldTouched }) => { */}
