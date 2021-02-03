@@ -22,7 +22,7 @@ const HospitalEntry = ({ date, discharge }: Props) => {
           />
         </h3>
         <div>
-          <b>Sickleave:</b> {discharge.date} - {discharge.criteria}
+          <b>Discharge:</b> {discharge.date} - {discharge.criteria}
         </div>
       </div>
     </>

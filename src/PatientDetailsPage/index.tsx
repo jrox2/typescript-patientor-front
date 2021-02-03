@@ -1,9 +1,20 @@
 import React, { useState } from "react";
 import { useLocation } from "react-router-dom";
 import axios from "axios";
-import { Card, Container, Icon, Label, Header, Grid } from "semantic-ui-react";
+import {
+  Card,
+  Container,
+  Icon,
+  Label,
+  Header,
+  Grid,
+  Button,
+} from "semantic-ui-react";
 import { Diagnose, Patient } from "../types";
 import { apiBaseUrl } from "../constants";
+import { EntryFormValues } from "../AddEntryModal/AddEntryForm";
+import AddEntryModal from "../AddEntryModal";
+import { addPatient, useStateValue } from "../state";
 import "./index.css";
 import HospitalEntry from "../components/HospitalEntry";
 import HealtcCheckEntry from "../components/HealthCheckEntry";
@@ -18,6 +29,35 @@ const PatientDetailsPage: React.FC = () => {
   const [entries, setEntries] = useState<Entries[]>([]);
   const [diagnoses, setDiagnoses] = useState<Diagnoses[]>([]);
 
+  const [{ patients }, dispatch] = useStateValue();
+
+  const [modalOpen, setModalOpen] = useState<boolean>(false);
+  const [error, setError] = useState<string | undefined>();
+
+  const openModal = (): void => setModalOpen(true);
+
+  const closeModal = (): void => {
+    setModalOpen(false);
+    setError(undefined);
+  };
+
+  const location = useLocation<{ pathname: string }>();
+  const idPrm: string[] = location.pathname.split("/");
+
+  const submitNewEntry = async (values: EntryFormValues) => {
+    try {
+      const { data: newEntry } = await axios.post<Patient>(
+        `${apiBaseUrl}/patients/${idPrm[2]}/entries`,
+        values
+      );
+      //dispatch({ type: "ADD_PATIENT", payload: newPatient });
+      dispatch(addPatient(newEntry));
+      closeModal();
+    } catch (e) {
+      console.error(e.response.data);
+      setError(e.response.data.error);
+    }
+  };
   interface Entries {
     date: string;
     type: string;
@@ -85,9 +125,6 @@ const PatientDetailsPage: React.FC = () => {
         break;
     }
   };
-
-  const location = useLocation<{ pathname: string }>();
-  const idPrm: string[] = location.pathname.split("/");
 
   React.useEffect(() => {
     const getDiagnoseName = async (codePrm: string | string[] | undefined) => {
@@ -203,6 +240,17 @@ const PatientDetailsPage: React.FC = () => {
                 </Grid.Row>
               </Card.Group>
             ))}
+            <Grid>
+              <Grid.Column>
+                <AddEntryModal
+                  modalOpen={modalOpen}
+                  onSubmit={submitNewEntry}
+                  error={error}
+                  onClose={closeModal}
+                />
+                <Button onClick={() => openModal()}>Add New Entry</Button>
+              </Grid.Column>
+            </Grid>
           </React.Fragment>
         }
       </Container>
