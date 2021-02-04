@@ -1,19 +1,23 @@
 import React from "react";
 import { Grid, Button } from "semantic-ui-react";
 import { Formik, Form, Field } from "formik";
-import { TextField, NumberField } from "../AddPatientModal/FormField";
+import {
+  TextField,
+  NumberField,
+  DiagnosisSelection,
+} from "../AddPatientModal/FormField";
 import { HealthCheckEntry } from "../types";
 import { useStateValue } from "../state";
 
-export type EntryFormValues = Omit<HealthCheckEntry, "id">;
+export type EntryHealthcheckFormValues = Omit<HealthCheckEntry, "id">;
 
 interface Props {
-  onSubmit: (values: EntryFormValues) => void;
+  onSubmit: (values: EntryHealthcheckFormValues) => void;
   onCancel: () => void;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const AddEntryForm: React.FC<Props> = ({ onSubmit, onCancel }) => {
+const AddHealthcheckEntryForm: React.FC<Props> = ({ onSubmit, onCancel }) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [{ diagnoses }] = useStateValue();
 
@@ -46,8 +50,7 @@ const AddEntryForm: React.FC<Props> = ({ onSubmit, onCancel }) => {
         return errors;
       }}
     >
-      {/* {({ isValid, dirty, setFieldValue, setFieldTouched }) => { */}
-      {({ isValid, dirty }) => {
+      {({ isValid, dirty, setFieldValue, setFieldTouched }) => {
         return (
           <Form className="form ui">
             Type: HealtcheckEntry
@@ -76,11 +79,11 @@ const AddEntryForm: React.FC<Props> = ({ onSubmit, onCancel }) => {
               min={0}
               max={3}
             />
-            {/*  <DiagnosisSelection
+            <DiagnosisSelection
               setFieldValue={setFieldValue}
               setFieldTouched={setFieldTouched}
               diagnoses={Object.values(diagnoses)}
-            /> */}
+            />
             <Grid>
               <Grid.Column floated="right" width={5}>
                 <Button
@@ -100,4 +103,4 @@ const AddEntryForm: React.FC<Props> = ({ onSubmit, onCancel }) => {
   );
 };
 
-export default AddEntryForm;
+export default AddHealthcheckEntryForm;

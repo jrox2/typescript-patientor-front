@@ -12,8 +12,10 @@ import {
 } from "semantic-ui-react";
 import { Diagnose, Patient } from "../types";
 import { apiBaseUrl } from "../constants";
-import { EntryFormValues } from "../AddEntryModal/AddEntryForm";
-import AddEntryModal from "../AddEntryModal";
+import { EntryHealthcheckFormValues } from "../AddHealthcheckEntryModal/AddHealthcheckEntryForm";
+import { HospitalEntryFormValues } from "../AddHospitalEntryModal/AddHospitalEntryForm";
+import AddHealthcheckEntryModal from "../AddHealthcheckEntryModal";
+import AddHospitalEntryModal from "../AddHospitalEntryModal";
 import { addPatient, useStateValue } from "../state";
 import "./index.css";
 import HospitalEntry from "../components/HospitalEntry";
@@ -32,9 +34,12 @@ const PatientDetailsPage: React.FC = () => {
   const [{ patients }, dispatch] = useStateValue();
 
   const [modalOpen, setModalOpen] = useState<boolean>(false);
+  const [modalHospitalOpen, setHospitalModalOpen] = useState<boolean>(false);
   const [error, setError] = useState<string | undefined>();
+  const [entryType, setEntryType] = useState("");
 
   const openModal = (): void => setModalOpen(true);
+  const openHospitalModal = (): void => setHospitalModalOpen(true);
 
   const closeModal = (): void => {
     setModalOpen(false);
@@ -44,13 +49,30 @@ const PatientDetailsPage: React.FC = () => {
   const location = useLocation<{ pathname: string }>();
   const idPrm: string[] = location.pathname.split("/");
 
-  const submitNewEntry = async (values: EntryFormValues) => {
+  const submitNewHealthcheckEntry = async (
+    values: EntryHealthcheckFormValues
+  ) => {
     try {
       const { data: newEntry } = await axios.post<Patient>(
         `${apiBaseUrl}/patients/${idPrm[2]}/entries`,
         values
       );
-      //dispatch({ type: "ADD_PATIENT", payload: newPatient });
+      dispatch({ type: "ADD_PATIENT", payload: newEntry });
+      dispatch(addPatient(newEntry));
+      closeModal();
+    } catch (e) {
+      console.error(e.response.data);
+      setError(e.response.data.error);
+    }
+  };
+
+  const submitNewHospitalEntry = async (values: HospitalEntryFormValues) => {
+    try {
+      const { data: newEntry } = await axios.post<Patient>(
+        `${apiBaseUrl}/patients/${idPrm[2]}/entries`,
+        values
+      );
+      dispatch({ type: "ADD_PATIENT", payload: newEntry });
       dispatch(addPatient(newEntry));
       closeModal();
     } catch (e) {
@@ -84,7 +106,6 @@ const PatientDetailsPage: React.FC = () => {
   const SetEntryDetails = (entry: Entries) => {
     switch (entry.type) {
       case "OccupationalHealthcare":
-        console.log("moro occu", entry.employerName, entry.sickLeave);
         setEntries((entries) => [
           ...entries,
           {
@@ -98,7 +119,6 @@ const PatientDetailsPage: React.FC = () => {
         ]);
         break;
       case "HealthCheck":
-        console.log("moro health", entry.healthCheckRating);
         setEntries((entries) => [
           ...entries,
           {
@@ -111,7 +131,6 @@ const PatientDetailsPage: React.FC = () => {
         ]);
         break;
       case "Hospital":
-        console.log("moro Hospital", entry.discharge);
         setEntries((entries) => [
           ...entries,
           {
@@ -156,7 +175,6 @@ const PatientDetailsPage: React.FC = () => {
           console.log("entries null");
         } else {
           patientDetailsFromApi.data.entries.map((entry) => {
-            console.log("entries type: ", entry);
             SetEntryDetails(entry);
             entry.diagnosisCodes?.map((code) => {
               getDiagnoseName(code);
@@ -241,14 +259,35 @@ const PatientDetailsPage: React.FC = () => {
               </Card.Group>
             ))}
             <Grid>
-              <Grid.Column>
-                <AddEntryModal
+              <Grid.Column floated="left" width={5}>
+                <AddHealthcheckEntryModal
                   modalOpen={modalOpen}
-                  onSubmit={submitNewEntry}
+                  onSubmit={submitNewHealthcheckEntry}
                   error={error}
                   onClose={closeModal}
+                  entryType={entryType}
                 />
-                <Button onClick={() => openModal()}>Add New Entry</Button>
+                <Button
+                  onClick={() => (setEntryType("Healtcheck"), openModal())}
+                >
+                  Add Healtcheck Entry
+                </Button>
+              </Grid.Column>
+              <Grid.Column floated="right" width={5}>
+                <AddHospitalEntryModal
+                  modalOpen={modalHospitalOpen}
+                  onSubmit={submitNewHospitalEntry}
+                  error={error}
+                  onClose={closeModal}
+                  entryType={entryType}
+                />
+                <Button
+                  onClick={() => (
+                    setEntryType("Hospital"), openHospitalModal()
+                  )}
+                >
+                  Add Hospital Entry
+                </Button>
               </Grid.Column>
             </Grid>
           </React.Fragment>
