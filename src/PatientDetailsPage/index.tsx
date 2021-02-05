@@ -13,8 +13,10 @@ import {
 import { Diagnose, Patient } from "../types";
 import { apiBaseUrl } from "../constants";
 import { EntryHealthcheckFormValues } from "../AddHealthcheckEntryModal/AddHealthcheckEntryForm";
+import { OccupationalHealthcareEntryFormValues } from "../AddOccupationalEntryModal/AddOccupationalEntryForm";
 import { HospitalEntryFormValues } from "../AddHospitalEntryModal/AddHospitalEntryForm";
 import AddHealthcheckEntryModal from "../AddHealthcheckEntryModal";
+import AddOccupationalEntryModal from "../AddOccupationalEntryModal";
 import AddHospitalEntryModal from "../AddHospitalEntryModal";
 import { addPatient, useStateValue } from "../state";
 import "./index.css";
@@ -29,20 +31,40 @@ const PatientDetailsPage: React.FC = () => {
   const [patientOccupation, setPatientOccupation] = useState("");
   const [genderIcon, setgenderIcon] = useState("other");
   const [entries, setEntries] = useState<Entries[]>([]);
-  const [diagnoses, setDiagnoses] = useState<Diagnoses[]>([]);
+  //const [diagnoses, setDiagnoses] = useState<Diagnoses[]>([]);
+  const [{ diagnoses }] = useStateValue();
 
   const [{ patients }, dispatch] = useStateValue();
 
-  const [modalOpen, setModalOpen] = useState<boolean>(false);
+  const [modalHealthcheckOpen, setHealthcheckModalOpen] = useState<boolean>(
+    false
+  );
   const [modalHospitalOpen, setHospitalModalOpen] = useState<boolean>(false);
+  const [
+    modalOccupationalHealthcareOpen,
+    setOccupationalHealthcareModalOpen,
+  ] = useState<boolean>(false);
+
   const [error, setError] = useState<string | undefined>();
   const [entryType, setEntryType] = useState("");
 
-  const openModal = (): void => setModalOpen(true);
+  const openHealthcheckModal = (): void => setHealthcheckModalOpen(true);
+  const openOccupationalHealthcareModal = (): void =>
+    setOccupationalHealthcareModalOpen(true);
   const openHospitalModal = (): void => setHospitalModalOpen(true);
 
-  const closeModal = (): void => {
-    setModalOpen(false);
+  const closeHealthcheckModal = (): void => {
+    setHealthcheckModalOpen(false);
+    setError(undefined);
+  };
+
+  const closeOccupationalHealthcareModal = (): void => {
+    setOccupationalHealthcareModalOpen(false);
+    setError(undefined);
+  };
+
+  const closeHospitalModal = (): void => {
+    setHospitalModalOpen(false);
     setError(undefined);
   };
 
@@ -59,13 +81,12 @@ const PatientDetailsPage: React.FC = () => {
       );
       dispatch({ type: "ADD_PATIENT", payload: newEntry });
       dispatch(addPatient(newEntry));
-      closeModal();
+      closeHealthcheckModal();
     } catch (e) {
       console.error(e.response.data);
       setError(e.response.data.error);
     }
   };
-
   const submitNewHospitalEntry = async (values: HospitalEntryFormValues) => {
     try {
       const { data: newEntry } = await axios.post<Patient>(
@@ -74,7 +95,24 @@ const PatientDetailsPage: React.FC = () => {
       );
       dispatch({ type: "ADD_PATIENT", payload: newEntry });
       dispatch(addPatient(newEntry));
-      closeModal();
+      closeHospitalModal();
+    } catch (e) {
+      console.error(e.response.data);
+      setError(e.response.data.error);
+    }
+  };
+
+  const submitNewOccupationalHealthcareEntry = async (
+    values: OccupationalHealthcareEntryFormValues
+  ) => {
+    try {
+      const { data: newEntry } = await axios.post<Patient>(
+        `${apiBaseUrl}/patients/${idPrm[2]}/entries`,
+        values
+      );
+      dispatch({ type: "ADD_PATIENT", payload: newEntry });
+      dispatch(addPatient(newEntry));
+      closeOccupationalHealthcareModal();
     } catch (e) {
       console.error(e.response.data);
       setError(e.response.data.error);
@@ -144,21 +182,28 @@ const PatientDetailsPage: React.FC = () => {
         break;
     }
   };
+  const getDiagnoseName = async (codePrm: string | string[] | undefined) => {
+    const diagnosisDetailsFromApi = await axios.get<Diagnose>(
+      `${apiBaseUrl}/diagnoses/${codePrm}`
+    );
+    /*  console.log(
+      "mikä tilanne?-->",
+      diagnoses,
+      "diagnosisDetailsFromApi: ",
+      diagnosisDetailsFromApi
+    ); */
+    /*  setDiagnoses((diagnoses) => [
+      ...diagnoses,
+      {
+        code: diagnosisDetailsFromApi.data.code,
+        name: diagnosisDetailsFromApi.data.name,
+        latin: diagnosisDetailsFromApi.data.latin,
+      }, 
+    ]);*/
+    return diagnosisDetailsFromApi.data.name;
+  };
 
   React.useEffect(() => {
-    const getDiagnoseName = async (codePrm: string | string[] | undefined) => {
-      const diagnosisDetailsFromApi = await axios.get<Diagnose>(
-        `${apiBaseUrl}/diagnoses/${codePrm}`
-      );
-      setDiagnoses((diagnoses) => [
-        ...diagnoses,
-        {
-          code: diagnosisDetailsFromApi.data.code,
-          name: diagnosisDetailsFromApi.data.name,
-          latin: diagnosisDetailsFromApi.data.latin,
-        },
-      ]);
-    };
     const fetchPatientDetails = async () => {
       enum genderIcons {
         male = "mars",
@@ -176,9 +221,18 @@ const PatientDetailsPage: React.FC = () => {
         } else {
           patientDetailsFromApi.data.entries.map((entry) => {
             SetEntryDetails(entry);
-            entry.diagnosisCodes?.map((code) => {
+            //setDiagnoses([]);
+            console.log(
+              "meniks tyhjäks? -->",
+              diagnoses,
+              "codes: ",
+              entry.diagnosisCodes,
+              "type:",
+              entry.type
+            );
+            /*  entry.diagnosisCodes?.map((code) => {
               getDiagnoseName(code);
-            });
+            }); */
           });
         }
 
@@ -219,6 +273,15 @@ const PatientDetailsPage: React.FC = () => {
     }
   };
 
+  //const diagName = getDiagnoseName("M51.2");
+  /* console.log("diagName: ", diagnoses);
+  console.log(
+    "dia: ",
+    diagnoses.map((el) => el.code === "M51.2")
+  ); */
+  /*  const found = diagnoses.find(code => code === 'M51.2')
+  console.log("found: ", found)}
+ */
   return (
     <div className="App">
       <Container textAlign="left">
@@ -246,11 +309,23 @@ const PatientDetailsPage: React.FC = () => {
                 </Card.Content>
                 <Card.Description>
                   <ul>
-                    {diagnoses?.map((diagnose, index) => (
+                    {entry.diagnosisCodes != undefined
+                      ? entry.diagnosisCodes?.map((diagnoseCode) => (
+                          // {diagName = getDiagnoseName(diagnoseCode)},
+
+                          <li>
+                            other: {diagnoseCode}
+                            {/* {diagName} */}
+                            {/* {getDiagnoseName(diagnoseCode)} */}
+                          </li>
+                        ))
+                      : null}
+                    {}
+                    {/*  {diagnoses?.map((diagnose, index) => (
                       <li key={index}>
                         {diagnose.code} {diagnose.name}
                       </li>
-                    ))}
+                    ))} */}
                   </ul>
                 </Card.Description>
                 <Grid.Row className="fluidLine">
@@ -261,16 +336,35 @@ const PatientDetailsPage: React.FC = () => {
             <Grid>
               <Grid.Column floated="left" width={5}>
                 <AddHealthcheckEntryModal
-                  modalOpen={modalOpen}
+                  modalOpen={modalHealthcheckOpen}
                   onSubmit={submitNewHealthcheckEntry}
                   error={error}
-                  onClose={closeModal}
+                  onClose={closeHealthcheckModal}
                   entryType={entryType}
                 />
                 <Button
-                  onClick={() => (setEntryType("Healtcheck"), openModal())}
+                  onClick={() => (
+                    setEntryType("Healtcheck"), openHealthcheckModal()
+                  )}
                 >
                   Add Healtcheck Entry
+                </Button>
+              </Grid.Column>
+              <Grid.Column floated="left" width={5}>
+                <AddOccupationalEntryModal
+                  modalOpen={modalOccupationalHealthcareOpen}
+                  onSubmit={submitNewOccupationalHealthcareEntry}
+                  error={error}
+                  onClose={closeOccupationalHealthcareModal}
+                  entryType={entryType}
+                />
+                <Button
+                  onClick={() => (
+                    setEntryType("OccupationalHealthcare"),
+                    openOccupationalHealthcareModal()
+                  )}
+                >
+                  Add Occupational Entry
                 </Button>
               </Grid.Column>
               <Grid.Column floated="right" width={5}>
@@ -278,7 +372,7 @@ const PatientDetailsPage: React.FC = () => {
                   modalOpen={modalHospitalOpen}
                   onSubmit={submitNewHospitalEntry}
                   error={error}
-                  onClose={closeModal}
+                  onClose={closeHospitalModal}
                   entryType={entryType}
                 />
                 <Button
