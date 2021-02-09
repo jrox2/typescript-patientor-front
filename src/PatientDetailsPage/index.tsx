@@ -31,7 +31,7 @@ const PatientDetailsPage: React.FC = () => {
   const [patientOccupation, setPatientOccupation] = useState("");
   const [genderIcon, setgenderIcon] = useState("other");
   const [entries, setEntries] = useState<Entries[]>([]);
-  const [{ diagnoses }] = useStateValue();
+  //const [{ diagnoses }] = useStateValue();
   const [diagnoseNames, setDiagnoseNames] = useState<Diagnoses[]>([]);
 
   const [{ patients }, dispatch] = useStateValue();
@@ -183,13 +183,6 @@ const PatientDetailsPage: React.FC = () => {
         break;
     }
   };
-  const getDiagnoseName = async (codePrm: string | string[] | undefined) => {
-    const diagnosisDetailsFromApi = await axios.get<Diagnose>(
-      `${apiBaseUrl}/diagnoses/${codePrm}`
-    );
-
-    return diagnosisDetailsFromApi.data.name;
-  };
 
   let diagArray2: Diagnoses[];
 
@@ -245,7 +238,7 @@ const PatientDetailsPage: React.FC = () => {
     );
   }
 
-  const getDiagName = (diagnoseCode: string): string | "No data" => {
+  const getDiagnoseName = (diagnoseCode: string): string | "No data" => {
     const found = diagnoseNames.find((code) => code.code == diagnoseCode);
     if (found?.name) {
       return found?.name;
@@ -303,7 +296,7 @@ const PatientDetailsPage: React.FC = () => {
                           // {diagName = getDiagnoseName(diagnoseCode)},
 
                           <li key={diagnoseCode}>
-                            {diagnoseCode} : {getDiagName(diagnoseCode)}
+                            {diagnoseCode} : {getDiagnoseName(diagnoseCode)}
                           </li>
                         ))
                       : null}
