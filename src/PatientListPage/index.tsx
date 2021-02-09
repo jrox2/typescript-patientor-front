@@ -38,8 +38,6 @@ const PatientListPage: React.FC = () => {
     }
   };
 
-  console.log("käytiinkö list täällä ees?");
-
   return (
     <div className="App">
       <Container textAlign="center">
@@ -58,7 +56,14 @@ const PatientListPage: React.FC = () => {
         <Table.Body>
           {Object.values(patients).map((patient: Patient) => (
             <Table.Row key={patient.id}>
-              <Table.Cell><a href={`details/${patient.id}`} onClick={() => <PatientDetailsPage />}>{patient.name}</a></Table.Cell>
+              <Table.Cell>
+                <a
+                  href={`details/${patient.id}`}
+                  onClick={() => <PatientDetailsPage />}
+                >
+                  {patient.name}
+                </a>
+              </Table.Cell>
               <Table.Cell>{patient.gender}</Table.Cell>
               <Table.Cell>{patient.occupation}</Table.Cell>
               <Table.Cell>{patient.ssn}</Table.Cell>
