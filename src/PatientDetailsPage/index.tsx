@@ -31,8 +31,8 @@ const PatientDetailsPage: React.FC = () => {
   const [patientOccupation, setPatientOccupation] = useState("");
   const [genderIcon, setgenderIcon] = useState("other");
   const [entries, setEntries] = useState<Entries[]>([]);
-  //const [diagnoses, setDiagnoses] = useState<Diagnoses[]>([]);
   const [{ diagnoses }] = useStateValue();
+  const [diagnoseNames, setDiagnoseNames] = useState<Diagnoses[]>([]);
 
   const [{ patients }, dispatch] = useStateValue();
 
@@ -80,6 +80,7 @@ const PatientDetailsPage: React.FC = () => {
         values
       );
       dispatch({ type: "ADD_PATIENT", payload: newEntry });
+      console.log("submitNewHealthcheckEntry: ", newEntry);
       dispatch(addPatient(newEntry));
       closeHealthcheckModal();
     } catch (e) {
@@ -186,24 +187,14 @@ const PatientDetailsPage: React.FC = () => {
     const diagnosisDetailsFromApi = await axios.get<Diagnose>(
       `${apiBaseUrl}/diagnoses/${codePrm}`
     );
-    /*  console.log(
-      "mikä tilanne?-->",
-      diagnoses,
-      "diagnosisDetailsFromApi: ",
-      diagnosisDetailsFromApi
-    ); */
-    /*  setDiagnoses((diagnoses) => [
-      ...diagnoses,
-      {
-        code: diagnosisDetailsFromApi.data.code,
-        name: diagnosisDetailsFromApi.data.name,
-        latin: diagnosisDetailsFromApi.data.latin,
-      }, 
-    ]);*/
+
     return diagnosisDetailsFromApi.data.name;
   };
 
+  let diagArray2: Diagnoses[];
+
   React.useEffect(() => {
+    diagArray2 = [];
     const fetchPatientDetails = async () => {
       enum genderIcons {
         male = "mars",
@@ -216,23 +207,21 @@ const PatientDetailsPage: React.FC = () => {
           `${apiBaseUrl}/patients/${idPrm[2]}`
         );
 
+        const diagnosisDetailsFromApi = await axios.get<Diagnoses[]>(
+          `${apiBaseUrl}/diagnoses`
+        );
+
+        diagnosisDetailsFromApi.data.map((i) => {
+          diagArray2.push(i);
+        });
+
+        setDiagnoseNames(diagArray2);
+
         if (patientDetailsFromApi.data.entries == null) {
           console.log("entries null");
         } else {
           patientDetailsFromApi.data.entries.map((entry) => {
             SetEntryDetails(entry);
-            //setDiagnoses([]);
-            console.log(
-              "meniks tyhjäks? -->",
-              diagnoses,
-              "codes: ",
-              entry.diagnosisCodes,
-              "type:",
-              entry.type
-            );
-            /*  entry.diagnosisCodes?.map((code) => {
-              getDiagnoseName(code);
-            }); */
           });
         }
 
@@ -256,6 +245,15 @@ const PatientDetailsPage: React.FC = () => {
     );
   }
 
+  const getDiagName = (diagnoseCode: string): string | "No data" => {
+    const found = diagnoseNames.find((code) => code.code == diagnoseCode);
+    if (found?.name) {
+      return found?.name;
+    } else {
+      return "No description found";
+    }
+  };
+
   const renderDetails = (entry: Entries) => {
     switch (entry.type) {
       case "HealthCheck":
@@ -273,15 +271,6 @@ const PatientDetailsPage: React.FC = () => {
     }
   };
 
-  //const diagName = getDiagnoseName("M51.2");
-  /* console.log("diagName: ", diagnoses);
-  console.log(
-    "dia: ",
-    diagnoses.map((el) => el.code === "M51.2")
-  ); */
-  /*  const found = diagnoses.find(code => code === 'M51.2')
-  console.log("found: ", found)}
- */
   return (
     <div className="App">
       <Container textAlign="left">
@@ -313,19 +302,12 @@ const PatientDetailsPage: React.FC = () => {
                       ? entry.diagnosisCodes?.map((diagnoseCode) => (
                           // {diagName = getDiagnoseName(diagnoseCode)},
 
-                          <li>
-                            other: {diagnoseCode}
-                            {/* {diagName} */}
-                            {/* {getDiagnoseName(diagnoseCode)} */}
+                          <li key={diagnoseCode}>
+                            {diagnoseCode} : {getDiagName(diagnoseCode)}
                           </li>
                         ))
                       : null}
                     {}
-                    {/*  {diagnoses?.map((diagnose, index) => (
-                      <li key={index}>
-                        {diagnose.code} {diagnose.name}
-                      </li>
-                    ))} */}
                   </ul>
                 </Card.Description>
                 <Grid.Row className="fluidLine">

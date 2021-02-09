@@ -25,8 +25,8 @@ const AddHospitalEntryForm: React.FC<Props> = ({ onSubmit, onCancel }) => {
         specialist: "",
         diagnosisCodes: [],
         discharge: {
-          date: "2021-02-04",
-          criteria: "Testix vaan",
+          date: "",
+          criteria: "",
         },
       }}
       onSubmit={onSubmit}
@@ -41,6 +41,12 @@ const AddHospitalEntryForm: React.FC<Props> = ({ onSubmit, onCancel }) => {
         }
         if (!values.specialist) {
           errors.specialist = requiredError;
+        }
+        if (!values.discharge.date) {
+          errors.discharge = requiredError;
+        }
+        if (!values.discharge.criteria) {
+          errors.discharge = requiredError;
         }
         return errors;
       }}
