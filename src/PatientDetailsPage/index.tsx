@@ -10,7 +10,7 @@ import {
   Grid,
   Button,
 } from "semantic-ui-react";
-import { Diagnose, Patient } from "../types";
+import { Patient } from "../types";
 import { apiBaseUrl } from "../constants";
 import { EntryHealthcheckFormValues } from "../AddHealthcheckEntryModal/AddHealthcheckEntryForm";
 import { OccupationalHealthcareEntryFormValues } from "../AddOccupationalEntryModal/AddOccupationalEntryForm";
@@ -34,6 +34,7 @@ const PatientDetailsPage: React.FC = () => {
   //const [{ diagnoses }] = useStateValue();
   const [diagnoseNames, setDiagnoseNames] = useState<Diagnoses[]>([]);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [{ patients }, dispatch] = useStateValue();
 
   const [modalHealthcheckOpen, setHealthcheckModalOpen] = useState<boolean>(
