@@ -18,7 +18,7 @@ interface Props {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const OccupationalHealthcareEntryForm: React.FC<Props> = ({
   onSubmit,
-  onCancel,
+  //onCancel,
 }) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [{ diagnoses }] = useStateValue();
